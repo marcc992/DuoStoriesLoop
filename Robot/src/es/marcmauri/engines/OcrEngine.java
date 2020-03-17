@@ -6,13 +6,9 @@
 package es.marcmauri.engines;
 
 import es.marcmauri.models.BeanText;
-import es.marcmauri.tools.MouseCorrectRobot;
 import java.awt.AWTException;
-import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Robot;
-import java.awt.Toolkit;
-import java.awt.event.InputEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,62 +22,16 @@ import net.sourceforge.tess4j.Word;
 public class OcrEngine {
     
     private final Tesseract OCR;
-    private final MouseCorrectRobot MouseTool;
-    private final Rectangle Device;
-    private final Dimension ScreenSize;
-    private final Robot robot = new Robot();
+    private final Robot robot;
 
-    public OcrEngine(double minX, double minY, double maxX, double maxY) throws AWTException, InterruptedException {
-        // Recuperamos el tamaño de la pantalla principal del PC
-        ScreenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        
+    public OcrEngine() throws AWTException, InterruptedException {        
         // Instanciamos y configuramos el OCR
         OCR = new Tesseract();
         OCR.setDatapath("C:\\Program Files\\Tesseract-OCR\\tessdata");
         OCR.setLanguage("eng");
         
-        MouseTool = new MouseCorrectRobot();    
-        // 1. Generamos el rectangulo del telefono donde escanear palabras
-        // 1.1. Movemos el raton a los puntos extremos para recoger los valores
-        MouseTool.moveMouseControlled(minX, minY);
-        int x = MouseTool.lastX;
-        int y = MouseTool.lastY;
-        MouseTool.moveMouseControlled(maxX, maxY);
-        int width = MouseTool.lastX - x;
-        int height = MouseTool.lastY - y;
-        // 1.2. Creamos el Rectangle con los valores de la pantalla del movil
-        Device = new Rectangle(x, y, width, height);
-        
-        /* debug */
-        System.out.println("[d] Esperamos datos (2 seg)");
-        Thread.sleep(1000);
-        double deviceMinX = Device.getX() / ScreenSize.width;
-        double deviceMaxX = Device.getMaxX() / ScreenSize.width;
-        double deviceMinY = Device.getY() / ScreenSize.height;
-        double deviceMaxY = Device.getMaxY() / ScreenSize.height;
-        System.out.println("[d] Coordenadas | porcentuales del Dispositivo:\n"
-                + "\tMin X = " + Device.getX() + " | " + deviceMinX + "\n"
-                + "\tMin Y = " + Device.getY() + " | " + deviceMinY + "\n"
-                + "\tMax X = " + Device.getMaxX() + " | " + deviceMaxX + "\n"
-                + "\tMax Y = " + Device.getMaxY() + " | " + deviceMaxY + "\n");
-        
-        Thread.sleep(500);
-        System.out.println("[d] Simulando rectangulo ...");
-        Thread.sleep(500);
-        
-        for (double j = Device.getMinY(); j < Device.getMaxY(); j += 40) {
-            for (double i = Device.getMinX(); i < Device.getMaxX(); i += 40) {
-                MouseTool.moveMouseControlledByPixels((int)i, (int)j);
-                Thread.sleep(30);
-                robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-                Thread.sleep(30);
-                robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-            }
-        }
-        
-        
-        /* !debug */
-        
+        // Instanciamos el robot
+         robot = new Robot();
     }
     
      // LEVEL => 2: Lineas; 3: Palabras
@@ -131,22 +81,26 @@ public class OcrEngine {
         return beanTextList;
     }
     
-    public List<BeanText> getWordsFromImage(BufferedImage img, boolean isSpanish) {
+    public List<BeanText> getWordsFromDevice(final Rectangle device, boolean isSpanish) {
         if (isSpanish) {
             OCR.setLanguage("spa");
         } else {
             OCR.setLanguage("eng");
         }
-        return getStringsFromImage(img, 3);
+        
+        BufferedImage bufImg = robot.createScreenCapture(device);
+        return getStringsFromImage(bufImg, 3);
     }
     
-    public List<BeanText> getLinesFromImage(BufferedImage img, boolean isSpanish) {
+    public List<BeanText> getLinesFromDevice(final Rectangle device, boolean isSpanish) {
         if (isSpanish) {
             OCR.setLanguage("spa");
         } else {
             OCR.setLanguage("eng");
         }
-        return getStringsFromImage(img, 2);
+        
+        BufferedImage bufImg = robot.createScreenCapture(device);
+        return getStringsFromImage(bufImg, 2);
     }
     
 }
