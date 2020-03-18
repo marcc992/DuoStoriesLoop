@@ -195,7 +195,7 @@ public class MobileEngine {
         }
         
         for (BeanText item : foundItems) {
-            if (word.equals(item.getContent())) {
+            if (word.equalsIgnoreCase(item.getContent())) {
                 found = true;
                 Thread.sleep(200);
                 MouseTools.moveMouseControlledByPixels(checkboxX, (int) MobileScreen.getMinY() + item.getCenterY());
@@ -213,7 +213,7 @@ public class MobileEngine {
         for (String word : words) {
             boolean found = false;
             for (BeanText item : foundItems) {
-            if (word.equals(item.getContent())) {
+            if (word.equalsIgnoreCase(item.getContent())) {
                     found = true;
                     Thread.sleep(200);
                     MouseTools.moveMouseControlledByPixels(
