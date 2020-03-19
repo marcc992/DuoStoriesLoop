@@ -30,8 +30,8 @@ public class MyRobot {
     private static final Point POSITION_BTN_CLOSE_CONFIRM = new Point(390,902);
     private static final int POSITION_CHECKBOX_X = 50;
     
-    private static final String[] espWords = new String[]{"yo", "cansada", "leche", "buenos", "la"};
-    private static final String[] engWords = new String[]{"i", "tired", "milk", "morning", "the"};
+    private static final String[] espWords = new String[]{"una", "poco", "t", "examen", "s"};
+    private static final String[] engWords = new String[]{"a", "some", "you", "exam", "yes"};
 
     /*
         Variables

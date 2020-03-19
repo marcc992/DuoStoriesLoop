@@ -477,6 +477,7 @@ public class MobileEngine {
             ++nRetry;
             Thread.sleep(350);
             wordsFound = clickOnItsCheckbox("ella le puso sal a su caf", true);
+            if (!wordsFound) wordsFound = wordsFound = clickOnItsCheckbox("lla le puso sal a su caf", true);
         } while (!wordsFound && nRetry <= MAX_RETRIES);
         
         if (wordsFound) {
